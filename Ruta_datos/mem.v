@@ -16,8 +16,8 @@ module mem (
 //w_h = 0 Mitad ; w_h = 1 Completa
 
   wire [2:0] ctrl_MEM = {MEM_RD, MEM_WR, w_h};
-//  reg [31:0] mem [0:127]; //Memoria de 32bits con 128 entradas
-  reg [31:0] mem [0:196608]; //Memoria de 32bits con 196608 entradas
+  reg [31:0] mem [0:127]; //Memoria de 32bits con 128 entradas
+  //reg [31:0] mem [0:196608]; //Memoria de 32bits con 196608 entradas
   reg [31:0] DO_MEMor = 32'b0;
 
   always @(posedge reloj)
