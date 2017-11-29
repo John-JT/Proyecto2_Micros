@@ -7,12 +7,13 @@
 
 
 module wb(
-  input DIR_WB,
-  input [31:0] DO,DIR,
-  output [31:0] out_mux_wb);
+  input DIR_WB1, DIR_WB2,
+  input [31:0] DO1, DIR1, DO2, DIR2,
+  output [31:0] out_mux_wb1, out_mux_wb2);
 
 
-  assign out_mux_wb = DIR_WB ? DIR : DO;
+  assign out_mux_wb1 = DIR_WB1 ? DIR1 : DO1;
+  assign out_mux_wb2 = DIR_WB2 ? DIR2 : DO2;
 
 
 endmodule

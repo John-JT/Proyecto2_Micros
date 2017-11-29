@@ -7,95 +7,186 @@
 // Module Name: decode
 //////////////////////////////////////////////////////////////////////////////////
 
-`ifndef DEBUG_CPU_REG
-`define DEBUG_CPU_REG 0
+
 module decode(
     input reloj,
-    input [4:0] DIR_A, DIR_B, DIR_WRA,
-    input [31:0] DI,
-    input REG_RD, REG_WR, SEL_I,
-    input [15:0] IMD,
-    input [25:0] address,
-    input [3:0] pc_4,
+    input [4:0] DIR_A1, DIR_B1, DIR_WRA1, DIR_A2, DIR_B2, DIR_WRA2,
+    input [31:0] DI1, DI2,
+    input REG_RD1, REG_WR1, SEL_I1, REG_RD2, REG_WR2, SEL_I2,
+    input [15:0] IMD1, IMD2,
+    input [25:0] address1, address2,
+    input [3:0] pc_4, pc_8,
 
-    output [31:0] DOA, DOB, out_mux_sz, 
-    output [31:0] out_addr);
+    output [31:0] DOA1, DOB1, out_mux_sz1, DOA2, DOB2, out_mux_sz2,
+    output [31:0] out_addr1, out_addr2);
 
 
-    reg [31:0] routA, routB = 32'b0;
     reg [31:0] registro [0:31];
-    reg [31:0] out_sign, out_zero = 0;
 
-initial begin
-		if (`DEBUG_CPU_REG) begin
-			$display("     $v0,      $v1,      $t0,      $t1,      $t2,      $t3,      $t4,      $t5,      $t6,      $t7,      $t8,      $t9");
-			$monitor("%x, %x, %x, %x, %x, %x, %x, %x, %x, %x, %x, %x",
-					registro[1][31:0],	/* $v0 */
-					registro[2][31:0],	/* $v1 */
-					registro[3][31:0],	/* $t0 */
-					registro[4][31:0],	/* $t1 */
-					registro[5][31:0],	/* $t2 */
-					registro[6][31:0],	/* $t3 */
-					registro[7][31:0],	/* $t4 */
-					registro[8][31:0],	/* $t5 */
-					registro[9][31:0],	/* $t6 */
-					registro[10][31:0],	/* $t7 */
-					registro[11][31:0],	/* $t7 */
-					registro[12][31:0],	/* $t7 */
-				);
-		end
-	end
+    reg [31:0] routA1, routB1 = 32'b0;
+    reg [31:0] routA2, routB2 = 32'b0;
+    reg [31:0] out_sign1, out_zero1 = 0;
+    reg [31:0] out_sign2, out_zero2 = 0;
 
-
+    wire [1:0] regRD = {REG_RD1, REG_RD2};
+    wire [1:0] regWR = {REG_WR1, REG_WR2};
 
    ////////// banco de registros
-    always @ (REG_RD, REG_WR, DIR_A, DIR_B)
+   /*always @ (*)
     begin
-    if (REG_RD == 1'b0)
+    if (REG_RD1 == 1'b0)
     begin
-        routA = registro [DIR_A];
-        routB = registro [DIR_B];
+        routA1 = registro [DIR_A1];
+        routB1 = registro [DIR_B1];
     end
     else
     begin
-        routA = 32'b0;
-        routB = 32'b0;
+        routA1 = 32'b0;
+        routB1 = 32'b0;
     end
+    end
+
+    always @ (*)
+     begin
+     if (REG_RD2 == 1'b0)
+     begin
+         routA2 = registro [DIR_A2];
+         routB2 = registro [DIR_B2];
+     end
+     else
+     begin
+         routA2 = 32'b0;
+         routB2 = 32'b0;
+     end
+     end*/
+
+
+
+
+
+    always @ (regRD, DIR_A1, DIR_B1, DIR_A2, DIR_B2)
+    begin
+      case (regRD)
+        2'b00:
+          begin
+          routA1 = registro [DIR_A1];
+          routB1 = registro [DIR_B1];
+          routA2 = registro [DIR_A2];
+          routB2 = registro [DIR_B2];
+          end
+        2'b01:
+          begin
+          routA1 = registro [DIR_A1];
+          routB1 = registro [DIR_B1];
+          routA2 = 32'b0;
+          routB2 = 32'b0;
+          end
+        2'b10:
+          begin
+          routA1 = 32'b0;
+          routB1 = 32'b0;
+          routA2 = registro [DIR_A2];
+          routB2 = registro [DIR_B2];
+          end
+        2'b11:
+          begin
+          routA1 = 32'b0;
+          routB1 = 32'b0;
+          routA2 = 32'b0;
+          routB2 = 32'b0;
+          end
+      endcase
+    end
+
+/*
+    always @ (posedge reloj)
+    begin
+    if (REG_WR1 == 0) registro[DIR_WRA1] <= DI1;
+    else registro[DIR_WRA1] <= registro[DIR_WRA1];
     end
 
     always @ (posedge reloj)
     begin
-    if (REG_WR == 0) registro[DIR_WRA] <= DI;
-    else registro[DIR_WRA] <= registro[DIR_WRA];
+    if (REG_WR2 == 0) registro[DIR_WRA2] <= DI2;
+    else registro[DIR_WRA2] <= registro[DIR_WRA2];
+    end
+*/
+
+    always @ (posedge reloj)
+    begin
+      case (regWR)
+        2'b00:
+        begin
+          registro[DIR_WRA1] <= DI1;
+          registro[DIR_WRA2] <= DI2;
+        end
+        2'b01:
+        begin
+          registro[DIR_WRA1] <= DI1;
+          registro[DIR_WRA2] <= registro[DIR_WRA2];
+        end
+        2'b10:
+        begin
+          registro[DIR_WRA1] <= registro[DIR_WRA1];
+          registro[DIR_WRA2] <= DI2;
+        end
+        2'b11:
+        begin
+          registro[DIR_WRA1] <= registro[DIR_WRA1];
+          registro[DIR_WRA2] <= registro[DIR_WRA2];
+        end
+      endcase
     end
 
-    assign DOA = routA;
-    assign DOB = routB;
+    assign DOA1 = routA1;
+    assign DOB1 = routB1;
+
+    assign DOA2 = routA2;
+    assign DOB2 = routB2;
 
 
     ///////////sign extension
-    always @(IMD)
+    always @(IMD1)
     begin
 
-    if(IMD[15]==1'b1) out_sign = {16'b1111111111111111,IMD};
+    if(IMD1[15]==1'b1) out_sign1 = {16'b1111111111111111,IMD1};
 
-    else out_sign = {16'b0000000000000000,IMD};
+    else out_sign1 = {16'b0000000000000000,IMD1};
+
+    end
+
+
+    always @(IMD2)
+    begin
+
+    if(IMD2[15]==1'b1) out_sign2 = {16'b1111111111111111,IMD2};
+
+    else out_sign2 = {16'b0000000000000000,IMD2};
 
     end
 
 
    /////// zero extension
-    always @(IMD)
+    always @(IMD1)
     begin
-    out_zero <= {16'b0000000000000000,IMD};
+    out_zero1 <= {16'b0000000000000000,IMD1};
+    end
+
+
+    always @(IMD2)
+    begin
+    out_zero2 <= {16'b0000000000000000,IMD2};
     end
 
 
     ////////// mux sign and zero
-    assign out_mux_sz = SEL_I ? out_sign: out_zero;
+    assign out_mux_sz1 = SEL_I1 ? out_sign1 : out_zero1;
+    assign out_mux_sz2 = SEL_I2 ? out_sign2 : out_zero2;
 
 
     /////// calculo para jump addr
-    assign out_addr = {pc_4,address,2'b00};
+    assign out_addr1 = {pc_4,address1,2'b00};
+    assign out_addr2 = {pc_8,address2,2'b00};
+
+
 endmodule
-`endif
