@@ -60,10 +60,6 @@ module decode(
      end
      end*/
 
-
-
-
-
     always @ (regRD, DIR_A1, DIR_B1, DIR_A2, DIR_B2)
     begin
       case (regRD)
@@ -103,12 +99,6 @@ module decode(
     begin
     if (REG_WR1 == 0) registro[DIR_WRA1] <= DI1;
     else registro[DIR_WRA1] <= registro[DIR_WRA1];
-    end
-
-    always @ (posedge reloj)
-    begin
-    if (REG_WR2 == 0) registro[DIR_WRA2] <= DI2;
-    else registro[DIR_WRA2] <= registro[DIR_WRA2];
     end
 */
 

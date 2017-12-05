@@ -10,7 +10,7 @@ module instruction_mem (
   );
 
   reg [31:0] mem [0:55]; //Memoria de 32bits con 52 entradas
-  parameter archivo = "mem_inst_pruebaSE2.txt";
+  parameter archivo = "mem_inst_SuperEscalar.txt";
 
   initial
     begin
