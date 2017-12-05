@@ -20,10 +20,8 @@ module Micro_TB(
     wire REG_WR1, REG_WR2;
     wire [31:0] DO_D1, DO_D2;
 
-    reg [31:0] arreglo1 [0:31];
-    reg [31:0] mem1 [0:31];
-    reg [31:0] arreglo2 [0:31];
-    reg [31:0] mem2 [0:31];
+    reg [31:0] arreglo[0:31];
+    reg [31:0] mem[0:31];
 
     integer i = 0;
     integer j = 0;
@@ -48,19 +46,11 @@ module Micro_TB(
 
 
     initial
-
     begin
-
     for (i = 0; i < 32; i = i + 1)    ////// inicialiazar arreglo en 0
         begin
-        arreglo1[i] = {31'b0};
-        mem1[i] = {31'b0};
-        end
-
-    for (j = 0; j < 32; j = j + 1)    ////// inicialiazar arreglo en 0
-        begin
-        arreglo2[j] = {31'b0};
-        mem2[j] = {31'b0};
+        arreglo[i] = {31'b0};
+        mem[i] = {31'b0};
         end
 
     reloj = 0;
@@ -68,30 +58,26 @@ module Micro_TB(
 
     #30;
     resetM = 0;
-
     end
 
 
     always
     begin
       @(posedge reloj);
-      if (P_C >= 12 && REG_WR1 == 0)
+      if (P_C >= 12)
       begin
-        arreglo1[DIR_WRA1] = {DI_banco1}|{DO_D1};
-        $display("%d: %h", DIR_WRA1, arreglo1[DIR_WRA1]);
-      end
-    end
+        if (REG_WR1 == 0)
+        begin
+          arreglo[DIR_WRA1] = {DI_banco1}|{DO_D1};
+          $display("%d: %h", DIR_WRA1, arreglo[DIR_WRA1]);
+        end
 /*
-    always
-    begin
-      @(posedge reloj);
-      if (P_C >= 12 && REG_WR2 == 0)
-      begin
-        arreglo2[DIR_WRA2] = {DI_banco2}|{DO_D2};
-        $display("%d: %h", "2", DIR_WRA2, arreglo2[DIR_WRA2]);
+        if (REG_WR2 == 0)
+        begin
+          arreglo[DIR_WRA2] = {DI_banco2}|{DO_D2};
+          $display("%d: %h", DIR_WRA2, arreglo[DIR_WRA2]);
+        end*/
       end
-      end
-*/
-
+    end
 
 endmodule
